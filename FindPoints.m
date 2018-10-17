@@ -1,11 +1,12 @@
 function centers = FindPoints(data,SNR,varargin)
+	DEBUG = 0;
 	ROI_size = 10;
 	ROI_border_size = 8;
 
-	if nargin = 4
+	if nargin == 4
 		ROI_size = varargin{1};
 		ROI_border_size = varargin{2};
-	else if nargin<2 || nargin>4
+    elseif nargin<2 || nargin>4
 		error('Not enough or too many input arguments: 3 or 4 input arguments are needed!');
 	end
 
@@ -23,8 +24,11 @@ function centers = FindPoints(data,SNR,varargin)
 
 	NoiseLevel = mean(mean(result));
 
-	% FrameShow(sumFrame,0,[]);
-	% FrameShow(result,0,[],figure(2));
+	% Debug
+	if DEBUG
+		% FrameShow(sumFrame,0,[]);
+		FrameShow(result,0,[],figure(2));
+	end
 
 	centers = [];
 
@@ -35,13 +39,18 @@ function centers = FindPoints(data,SNR,varargin)
 		if max_temp/NoiseLevel >= SNR
 			[~,max_y] = max(result(:,max_x));
 			result(max_y - ROI_size/5 - ROI_border_size:max_y + ROI_size/5 + ROI_border_size,max_x - ROI_size/5 - ROI_border_size:max_x + ROI_size/5 + ROI_border_size) = NoiseLevel;
-			centers(end+1,:) = [max_x,max_y];
+			if max_x>ROI_border_size+ROI_size && max_y>ROI_border_size+ROI_size && max_x<size(result,2)-ROI_border_size-ROI_size && max_y<size(result,1)-ROI_border_size-ROI_size
+				centers(end+1,:) = [max_x,max_y];
+			else
+				continue;
+			end
 
-			% temp = get(figure(1),'Child');
-			% PlotROI(figure(1),temp(2),centers(end,:),ROI_size,ROI_border_size);
-			% temp = get(figure(2),'Child');
-			% PlotROI(figure(2),temp(2),centers(end,:),ROI_size,ROI_border_size);
-			% keyboard;
+			% Debug
+			if DEBUG
+				temp = get(figure(2),'Child');
+				PlotROI(figure(2),temp(1),centers(end,:),ROI_size,ROI_border_size);
+				keyboard;
+			end
 		else
 			break;
 		end
@@ -52,3 +61,12 @@ function centers = FindPoints(data,SNR,varargin)
 			break;
 		end
 	end
+
+	centers = sortrows(FindPeak2D(sumFrame,centers,ROI_size,ROI_size/2));
+	ClosePointIndex = find(sum(diff(centers).^2,2) < ROI_size^2*2);
+	if ~isempty(ClosePointIndex)
+		centers(ClosePointIndex,:) = 0;
+		centers(ClosePointIndex+1,:) = 0;
+		centers(centers(:,1)==0,:) = [];
+	end
+end

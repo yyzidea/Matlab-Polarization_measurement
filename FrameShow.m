@@ -16,8 +16,10 @@ function FrameShow(data,FrameIndex,ROI_center,varargin)
 	end
 
 	clf(figure_handle);
-	subaxe1 = subplot('Position',[0.1,0.4,0.3,0.6]);
-	subaxe2 = subplot('Position',[0.1+0.5,0.4,0.3,0.6]);
+	% subaxe1 = subplot('Position',[0.1,0.4,0.3,0.6]);
+	% subaxe2 = subplot('Position',[0.1+0.5,0.4,0.3,0.6]);
+	subaxe1 = subplot(1,2,1);
+	subaxe2 = subplot(1,2,2);
 
 	ROI_range = zeros(1,size(data,1));
 
