@@ -16,6 +16,7 @@ function ROI = QDPLTraceExtraction(data,ROI_center,varargin)
 	end
 
 	ROI = zeros(size(ROI_center,1),size(data,1));
+	% ROI_noise = ROI;
 
 	if DEBUG
 		% Default axes position: [0.1300 0.1100 0.7750 0.8150]
@@ -34,7 +35,10 @@ function ROI = QDPLTraceExtraction(data,ROI_center,varargin)
 			ROI_background = sum(sum(frame(ROI_center(CenterIndex,2)-ROI_size/2-ROI_border_size:ROI_center(CenterIndex,2)+ROI_size/2+ROI_border_size,ROI_center(CenterIndex,1)-ROI_size/2-ROI_border_size:ROI_center(CenterIndex,1)+ROI_size/2+ROI_border_size)));
 			ROI_background = (ROI_background - ROI_range)/((ROI_size+ROI_border_size*2+1)^2-(ROI_size+1)^2);
 			ROI(CenterIndex,FrameIndex) = ROI_range - ROI_background*(ROI_size+1)^2;
-		
+			if DEBUG
+				ROI_noise(CenterIndex,FrameIndex) = ROI_background;
+			end
+
 			% % Debug function to choose the ROI center.
 			if DEBUG
 				frame_bw = frame/max(max(frame));
@@ -77,6 +81,9 @@ function ROI = QDPLTraceExtraction(data,ROI_center,varargin)
 			end
 		end
 	end
+
+	if DEBUG && ~isempty(ROI_noise)
+		fprintf('QDPLTraceExtraction:ROI_noise:%f\n',mean(mean(ROI_noise)));
+		% keyboard;
+	end
 end
-
-
