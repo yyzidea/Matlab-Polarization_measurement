@@ -1,4 +1,9 @@
 function [deviation,varargout] = PointTrace(centers1,centers2,offset)
+	% This function trace the points after certain deviation, 
+	% then return the 'deviation' and the index map from 'centers' to 'centers2'.
+	% The index map only include the mapping of the common points.
+	% Here, 'offset' specify the tolerant of individual point drift.
+
 	PointMatrixRowLen = max(vertcat(centers1(:,1),centers2(:,1)))+offset;
 	PointMatrixColLen = max(vertcat(centers1(:,2),centers2(:,2)))+offset;
 

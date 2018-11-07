@@ -1,4 +1,7 @@
 function  M = PlotTrace(ROI,M,figure_handle,varargin);
+	% This function plot the stacked PL traces of multiple points in single figure 'figure_handle'.
+	% Here, 'ROI' is the PL trace data, 'M' is the baseline of the stacked plot.
+	
 	figure(figure_handle);
 	if nargin == 4
 		subaxes = get(gcf,'Child');

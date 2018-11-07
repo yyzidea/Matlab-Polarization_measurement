@@ -1,4 +1,6 @@
 function ROI = QDPLTraceExtraction(data,ROI_center,varargin)
+	% This function extract the PL trace of points in certain image 'data'.
+	
 	DEBUG = 0;
 	ROI_size = 10;
 	ROI_border_size = 3;

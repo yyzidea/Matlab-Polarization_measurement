@@ -1,30 +1,42 @@
 figure(1);
-clf(1);
-subplot(2,1,1);
-histogram((I_1-I_2)./(I_1+I_2),linspace(-1,1,10));
 
-set(gca,'FontSize',14);
+subaxe1 = subplot('Position',[0.1,0.4,0.3,0.55]);
+subaxe2 = subplot('Position',[0.1+0.5,0.4,0.3,0.55]);
+subaxe3 = subplot('Position',[0.1,0.1,0.3,0.2]);
+subaxe4 = subplot('Position',[0.1+0.5,0.1,0.3,0.2]);
 
-subplot(2,1,2);
-box on;
-result = sortrows(vertcat(variance_1,variance_2,a+b,(a-b)./(a+b))');
-yyaxis left;
-plot(abs(result(:,4)));
-yyaxis right;
-semilogy(1:size(result,1),result(:,1),1:size(result,1),result(:,2),1:size(result,1),result(:,3));
-set(gca,'FontSize',14);
+% CurrentDataIndex = 0;
+Dir = 'data/2018_11/Ensemble anisotropy/11_02';
 
+for i = 1:length(DebugLog)
+	if CurrentDataIndex ~= DebugLog(i).DataIndex
+		if mod(DebugLog(i).DataIndex,2) == 1
+			CurrentDataIndex = DebugLog(i).DataIndex;
+			load(sprintf('%s_%d.mat',DebugLog(i).DataDir,CurrentDataIndex*2-1));
+			frame1 = squeeze(sum(data));
+			load(sprintf('%s_%d.mat',DebugLog(i).DataDir,CurrentDataIndex*2));
+			frame2 = squeeze(sum(data));
+		else
+			CurrentDataIndex = DebugLog(i).DataIndex;
+			load(sprintf('%s_%d.mat',DebugLog(i).DataDir,CurrentDataIndex*2));
+			frame1 = squeeze(sum(data));
+			load(sprintf('%s_%d.mat',DebugLog(i).DataDir,CurrentDataIndex*2-1));
+			frame2 = squeeze(sum(data));
+		end
+	end
 
+	M = max([max(max(frame1)),max(max(frame2))]);
+	set(gcf,'CurrentAxes',subaxe1);
+	imshow(frame1/M);
+	PlotROI(gcf,subaxe1,DebugLog(i).SpecialCenters1,10,2);
+	set(gcf,'CurrentAxes',subaxe2);
+	imshow(frame2/M);
+	PlotROI(gcf,subaxe2,DebugLog(i).SpecialCenters2,10,2);
 
-% figure(3);
-% clf(3);
-% box on;
-% hold on;
+	set(gcf,'CurrentAxes',subaxe3);
+	plot(DebugLog(i).ROI1);
+	set(gcf,'CurrentAxes',subaxe4);
+	plot(DebugLog(i).ROI2);
 
-% M = 0;
-% for i = 1:size(ROI,1)
-% 	plot(ROI(i,:)+M);
-% 	M = max(ROI(i,:))*1.2+M;
-% 	plot([0,size(ROI,2)],[M,M],'k--');
-% end
-% hold off;
+	pause;
+end

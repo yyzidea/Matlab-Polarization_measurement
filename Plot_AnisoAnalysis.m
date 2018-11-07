@@ -1,3 +1,4 @@
+% This script plot the result of function 'AnisoAnalysis'.
 figure(1);
 clf(1);
 subplot(2,1,1);

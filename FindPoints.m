@@ -1,4 +1,6 @@
 function centers = FindPoints(data,SNR,varargin)
+	% This function find all the points in the image 'data' that satisfy the 'SNR' requirement.
+	% The 'ROI_size' and 'ROI_border_size' can be specified via 'varargin', i.e. FindPoints(data,SNR,ROI_center,ROI_border_size).
 	DEBUG = 0;
 	ROI_size = 10;
 	ROI_border_size = 8;
