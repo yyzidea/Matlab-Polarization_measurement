@@ -27,7 +27,11 @@ function FrameShow(data,FrameIndex,ROI_center,varargin)
 		frame = squeeze(data(FrameIndex,:,:));
 	else
 		if length(size(data)) == 3
-			frame = squeeze(sum(data));
+			if size(data,1) == 1
+				frame = squeeze(data);
+			else
+				frame = squeeze(sum(data));
+			end
 		else
 			frame = data;
 		end
@@ -43,8 +47,7 @@ function FrameShow(data,FrameIndex,ROI_center,varargin)
 	ROI_background_y = ROI_y + [-ROI_border_size,ROI_border_size,ROI_border_size,-ROI_border_size];
 
 	set(figure_handle,'CurrentAxes',subaxe1);
-	frame_bw = frame/max(max(frame));
-	imshow(frame_bw);
+	mesh(1:size(frame,2),1:size(frame,1),frame');
 
 	set(figure_handle,'CurrentAxes',subaxe2);
 	frame_bw_contrast = (frame-min(min(frame)))/(max(max(frame))-min(min(frame)));

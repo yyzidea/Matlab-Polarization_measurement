@@ -24,8 +24,12 @@ function centers = FindPoints(data,SNR,varargin)
 	result(:,1:12) = 0;
 	result(:,end-11:end) = 0;
 
-	NoiseLevel = mean(mean(result));
+	BackgroundCount = mean(mean(result));
 
+	temp = result(result~=0);
+	NoiseStd = std(temp(temp<mean(temp)));
+
+	% keyboard;
 	% Debug
 	if DEBUG
 		% FrameShow(sumFrame,0,[]);
@@ -38,9 +42,10 @@ function centers = FindPoints(data,SNR,varargin)
 
 	while 1
 		[max_temp,max_x] = max(max(result));
-		if max_temp/NoiseLevel >= SNR
+		% if (max_temp-BackgroundCount)/NoiseStd >= SNR
+		if max_temp/BackgroundCount >= SNR
 			[~,max_y] = max(result(:,max_x));
-			result(max_y - ROI_size/5 - ROI_border_size:max_y + ROI_size/5 + ROI_border_size,max_x - ROI_size/5 - ROI_border_size:max_x + ROI_size/5 + ROI_border_size) = NoiseLevel;
+			result(max_y - ROI_size/5 - ROI_border_size:max_y + ROI_size/5 + ROI_border_size,max_x - ROI_size/5 - ROI_border_size:max_x + ROI_size/5 + ROI_border_size) = BackgroundCount;
 			if max_x>ROI_border_size+ROI_size && max_y>ROI_border_size+ROI_size && max_x<size(result,2)-ROI_border_size-ROI_size && max_y<size(result,1)-ROI_border_size-ROI_size
 				centers(end+1,:) = [max_x,max_y];
 			else

@@ -10,6 +10,9 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 
 	DataLen = length(regexp(ls(sprintf('%s_*.mat',Dir)),'\w+.mat','match'))/2;
 
+	result_figure_handle = 1;
+	debug_figure_handle = 5;
+
 	for i = 1:nargin
 		switch i
 			case 1
@@ -39,7 +42,6 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 		end
 	end
 
-
 	I_1 = [];
 	I_2 = [];
 
@@ -54,7 +56,6 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 		variance_1 = [];
 		variance_2 = [];
 
-		debug_figure_handle = 5;
 		figure(debug_figure_handle);
 		clf(debug_figure_handle);
 
@@ -96,7 +97,8 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 		I_2 = horzcat(I_2,temp2);
 
 		if DEBUG_OPTION.logging
-			temp = abs((temp1-temp2)./(temp1+temp2))>0.4;
+			% temp = abs((temp1-temp2)./(temp1+temp2))>0.4;
+			temp = temp1==temp1;
 
 			DebugLog(end+1:end+sum(temp)) = struct('DataDir',Dir,'DataIndex',num2cell(ones(sum(temp),1)*DataIndexSeries(i)),...
 				'SpecialCenters1',num2cell(centers1(temp,:),2),'SpecialCenters2',num2cell(centers2(temp,:),2),...
@@ -107,10 +109,10 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 
 		fprintf('No. of Points: %d\n',length(I_1));
 		if DEBUG_OPTION.standard
-			% M1 = PlotTrace(ROI1,M1,3);
-			% M2 = PlotTrace(ROI2,M2,4);
-			M1 = PlotTrace(ROI1(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M1,debug_figure_handle,1);
-			M2 = PlotTrace(ROI2(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M2,debug_figure_handle,2);
+			M1 = PlotTrace(ROI1,M1,debug_figure_handle,1);
+			M2 = PlotTrace(ROI2,M2,debug_figure_handle,2);
+			% M1 = PlotTrace(ROI1(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M1,debug_figure_handle,1);
+			% M2 = PlotTrace(ROI2(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M2,debug_figure_handle,2);
 			
 			figure(debug_figure_handle);
 			subaxes = get(gcf,'Child');
@@ -121,26 +123,23 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 			pause(0.1);
 		end
 
+		figure(result_figure_handle);
+		histogram((I_1-I_2)./(I_1+I_2),linspace(-1,1,20));
+		drawnow;
 	end
 
-	figure(2);
-	histogram((I_1-I_2)./(I_1+I_2),linspace(-1,1,20));
-
-	if DEBUG_OPTION.standard
+	if DEBUG_OPTION.logging
+		varargout{1} = DebugLog;
+	elseif DEBUG_OPTION.standard 
 		varargout{1} = variance_1;
 		varargout{2} = variance_2;
-		if DEBUG_OPTION.logging
-			varargout{3} = DebugLog;
-		end
-	elseif DEBUG_OPTION.logging
-		varargout{1} = DebugLog;
 	end
 
 end
 
 function [I,centers,varargout] = ExtractIntensity(Dir,ROI_size,varargin)
-	DEBUG = 0;
-	SNR = 2;
+	DEBUG = 1;
+	SNR = 1.4;
 	load(Dir);
 
 	if nargin == 3
@@ -170,8 +169,9 @@ function [I,centers,varargout] = ExtractIntensity(Dir,ROI_size,varargin)
 	% keyboard;
 
 	if DEBUG
-		FrameShow(data,0,[],figure(3));
+		FrameShow(data,0,[],figure(6));
 		arrayfun(@(x,y) PlotROI(gcf,gca,[x,y],10,2),centers(:,1),centers(:,2));
+		keyboard;
 	end
 
 	fprintf('Complete:%s\n', Dir);
