@@ -24,16 +24,15 @@ function centers = FindPoints(data,SNR,varargin)
 	result(:,1:12) = 0;
 	result(:,end-11:end) = 0;
 
-	BackgroundCount = mean(mean(result));
-
-	temp = result(result~=0);
-	NoiseStd = std(temp(temp<mean(temp)));
+	BackgroundCount = mean(mean(sumFrame));
+	NoiseStd = std(sumFrame(sumFrame<BackgroundCount))*2;
 
 	% keyboard;
 	% Debug
 	if DEBUG
 		% FrameShow(sumFrame,0,[]);
-		FrameShow(result,0,[],figure(2));
+		figure(2);
+		FrameShow(result,0,[],gcf);
 	end
 
 	centers = [];
@@ -42,10 +41,13 @@ function centers = FindPoints(data,SNR,varargin)
 
 	while 1
 		[max_temp,max_x] = max(max(result));
-		% if (max_temp-BackgroundCount)/NoiseStd >= SNR
-		if max_temp/BackgroundCount >= SNR
-			[~,max_y] = max(result(:,max_x));
-			result(max_y - ROI_size/5 - ROI_border_size:max_y + ROI_size/5 + ROI_border_size,max_x - ROI_size/5 - ROI_border_size:max_x + ROI_size/5 + ROI_border_size) = BackgroundCount;
+		[~,max_y] = max(result(:,max_x));
+
+		peak = max(max(sumFrame(max_y - ROI_size/2:max_y + ROI_size/2,max_x - ROI_size/2:max_x + ROI_size/2)));
+
+		if (peak-BackgroundCount)/NoiseStd >= SNR
+		% if max_temp/BackgroundCount >= SNR
+			result(max_y - ROI_size/2 - ROI_border_size:max_y + ROI_size/2 + ROI_border_size,max_x - ROI_size/2 - ROI_border_size:max_x + ROI_size/2 + ROI_border_size) = BackgroundCount;
 			if max_x>ROI_border_size+ROI_size && max_y>ROI_border_size+ROI_size && max_x<size(result,2)-ROI_border_size-ROI_size && max_y<size(result,1)-ROI_border_size-ROI_size
 				centers(end+1,:) = [max_x,max_y];
 			else
@@ -54,8 +56,8 @@ function centers = FindPoints(data,SNR,varargin)
 
 			% Debug
 			if DEBUG
-				temp = get(figure(2),'Child');
-				PlotROI(figure(2),temp(1),centers(end,:),ROI_size,ROI_border_size);
+				subplot(1,2,2);
+				PlotROI(gcf,gca,centers(end,:),ROI_size,ROI_border_size);
 				keyboard;
 			end
 		else

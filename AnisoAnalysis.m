@@ -109,10 +109,10 @@ function [I_1,I_2,varargout] = AnisoAnalysis(Dir,varargin)
 
 		fprintf('No. of Points: %d\n',length(I_1));
 		if DEBUG_OPTION.standard
-			M1 = PlotTrace(ROI1,M1,debug_figure_handle,1);
-			M2 = PlotTrace(ROI2,M2,debug_figure_handle,2);
-			% M1 = PlotTrace(ROI1(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M1,debug_figure_handle,1);
-			% M2 = PlotTrace(ROI2(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M2,debug_figure_handle,2);
+			M1 = PlotTrace(ROI1,M1,200,debug_figure_handle,1);
+			M2 = PlotTrace(ROI2,M2,200,debug_figure_handle,2);
+			% M1 = PlotTrace(ROI1(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M1,200,debug_figure_handle,1);
+			% M2 = PlotTrace(ROI2(abs((temp1-temp2)./(temp1+temp2))>0.3,:),M2,200,debug_figure_handle,2);
 			
 			figure(debug_figure_handle);
 			subaxes = get(gcf,'Child');
