@@ -25,56 +25,55 @@
 
 % A = (1-tan(phi).^2)/(1+tan(phi).^2+2*tan(phi));
 
-% %%%%%% Block1 %%%%%%
-% 	figure(1);
-% 	% clf(1);
-% 	% subplot(2,2,1);
-% 	% SampleNumber = floor(1000/pi*6);
-% 	% x0 = rand(1,SampleNumber)*2-1;
-% 	% % x0(end) = [];
-% 	% y0 = rand(1,SampleNumber)*2-1;
-% 	% % y0(end) = [];
-% 	% z0 = rand(1,SampleNumber)*2-1;
-% 	% % z0(end) = [];
-% 	% % [Y,Z] = meshgrid(y0,z0);
-% 	% index = x0.^2+y0.^2+z0.^2<=1;
-% 	% x0 = x0(index);
-% 	% y0 = y0(index);
-% 	% z0 = z0(index);
-% 	% phiv = rand(1,length(x0))*2*pi;
+%%%%%% Block1 %%%%%%
+	figure(3);
+	clf(3);
+	% SampleNumber = floor(100/pi*6);
+	% x0 = rand(1,SampleNumber)*2-1;
+	% % x0(end) = [];
+	% y0 = rand(1,SampleNumber)*2-1;
+	% % y0(end) = [];
+	% z0 = rand(1,SampleNumber)*2-1;
+	% % z0(end) = [];
+	% % [Y,Z] = meshgrid(y0,z0);
+	% index = x0.^2+y0.^2+z0.^2<=1;
+	% x0 = x0(index);
+	% y0 = y0(index);
+	% z0 = z0(index);
+	% phiv = rand(1,length(x0))*2*pi;
 	% Excitation = 1/sqrt(2)*[1,1*exp(1i*pi/2)];
 
-% 	% SampleNumber = length(x0);
+	% SampleNumber = length(x0);
 
-% 	% aniso = zeros(1,SampleNumber);
-% 	tic;
-% 	t0 = toc;
-% 	for i = 1:SampleNumber
-% 		aniso(i) = Anisotropy([x0(i);y0(i);z0(i)],phiv(i),[0;0;1],Excitation);
-% 		if mod(i,10) == 0
-% 			fprintf('Completed: %d/%d Elapse Time:%.2f/%.2f\n',i,SampleNumber,toc-t0,(toc-t0)/i*(SampleNumber-i));
-% 		end
-% 	end
+	% aniso = zeros(1,SampleNumber);
+	tic;
+	t0 = toc;
+	for i = 1:SampleNumber
+		aniso(i) = Anisotropy([x0(i);y0(i);z0(i)],phiv(i),[0.5;0.5;0],Excitation);
+		if mod(i,10) == 0
+			fprintf('Completed: %d/%d Elapse Time:%.2f/%.2f\n',i,SampleNumber,toc-t0,(toc-t0)/i*(SampleNumber-i));
+		end
+	end
 
-% 	% aniso = arrayfun(@(x0,y0,z0,theta0) Anisotropy(x0,y0,z0,theta0,0.5,0.5,0),x0,y0,z0,theta);
+	% aniso = arrayfun(@(x0,y0,z0,theta0) Anisotropy(x0,y0,z0,theta0,0.5,0.5,0),x0,y0,z0,theta);
 
 
-% 	% N = histcounts(aniso,10);
-% 	histogram(aniso,linspace(-1,1,20));
-% 	xlim([-1,1]);
+	% N = histcounts(aniso,10);
+	histogram(aniso,linspace(-1,1,40));
+	xlim([-1,1]);
 
-% 	% at = cell2mat(arrayfun(@(x0,y0,z0,theta0) WavefunctionEnd([x0;y0;z0],theta0,[0;0;1]),x0,y0,z0,phiv,'UniformOutput',false));
+	% at = cell2mat(arrayfun(@(x0,y0,z0,theta0) WavefunctionEnd([x0;y0;z0],theta0,[0;0;1]),x0,y0,z0,phiv,'UniformOutput',false));
 
-% 	% subplot(2,2,4);
-% 	% plot3(at(1,:),at(2,:),at(3,:),'o');
-% 	% axis equal;
+	% subplot(2,2,4);
+	% plot3(at(1,:),at(2,:),at(3,:),'o');
+	% axis equal;
 
 % %%%%%% Block2 %%%%%%
-% 	phi = 0:0.01:2*pi;
-% 	theta = 0:0.01:pi;
-% 	[phi,theta] = meshgrid(phi,theta);
+	% phi = 0:0.01:2*pi;
+	% theta = 0:0.01:pi;
+	% [phi,theta] = meshgrid(phi,theta);
 
-% 	a = [1;0;0];
+	% a = [1;0;0];
 	
 % 	f_I_x = @(phi,theta) (a(1).*(cos(theta) - sin(phi).^2.*(cos(theta) - 1)) + a(3).*cos(phi).*sin(-theta) + a(2).*cos(phi).*sin(phi).*(cos(theta) - 1)).^2;
 % 	f_I_y = @(phi,theta) (a(2).*(cos(theta) - cos(phi).^2.*(cos(theta) - 1)) + a(3).*sin(phi).*sin(-theta) + a(1).*cos(phi).*sin(phi).*(cos(theta) - 1)).^2;
@@ -155,54 +154,54 @@
 % 	axis equal;
 
 
-%%%%% Block4 %%%%%%
-	figure(5);
-	clf(5);
-	box on;
-	axis equal;
-	hold on;
+% %%%%% Block4 %%%%%%
+% 	figure(5);
+% 	clf(5);
+% 	box on;
+% 	axis equal;
+% 	hold on;
 
-	v = [1,1,1];
+% 	v = [1,1,1];
 
-	theta0 = acos(v(3));
-	phi0 = atan2(v(2),v(1));
-	phi0(phi0<0) = phi0(phi0<0)+pi*2;
+% 	theta0 = acos(v(3));
+% 	phi0 = atan2(v(2),v(1));
+% 	phi0(phi0<0) = phi0(phi0<0)+pi*2;
 
-	pos = [1,0,0;0,1,0;0,0,1];
+% 	pos = [1,0,0;0,1,0;0,0,1];
 
-	post = zeros(3);
-	% post(1,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(1,:)');
-	% post(2,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(2,:)');
-	% post(3,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(3,:)');
-	% WavefunctionEndSym(v,phiv,phi0,theta0,a) = M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*a;
-	% post(:,1) = WavefunctionEnd(v,phiv(1),pos(:,1));
-	% post(:,2) = WavefunctionEnd(v,phiv(1),pos(:,2));
-	% post(:,3) = WavefunctionEnd(v,phiv(1),pos(:,3));
+% 	post = zeros(3);
+% 	% post(1,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(1,:)');
+% 	% post(2,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(2,:)');
+% 	% post(3,:) = double(M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*pos(3,:)');
+% 	% WavefunctionEndSym(v,phiv,phi0,theta0,a) = M(v(1),v(2),v(3),phiv)*R_z(phi0)*R_y(theta0)*a;
+% 	% post(:,1) = WavefunctionEnd(v,phiv(1),pos(:,1));
+% 	% post(:,2) = WavefunctionEnd(v,phiv(1),pos(:,2));
+% 	% post(:,3) = WavefunctionEnd(v,phiv(1),pos(:,3));
 
-	quiver3(0,0,0,pos(1,1),pos(2,1),pos(3,1),'r');
-	quiver3(0,0,0,pos(1,2),pos(2,2),pos(3,2),'g');
-	quiver3(0,0,0,pos(1,3),pos(2,3),pos(3,3),'b');
-	% quiver3(0,0,0,post(1,1),post(2,1),post(3,1),'r--');
-	% quiver3(0,0,0,post(1,2),post(2,2),post(3,2),'g--');
-	% quiver3(0,0,0,post(1,3),post(2,3),post(3,3),'b--');
-	% quiver3(0,0,0,v(1),v(2),v(3),'k');
-	view(37.5,30);
+% 	quiver3(0,0,0,pos(1,1),pos(2,1),pos(3,1),'r');
+% 	quiver3(0,0,0,pos(1,2),pos(2,2),pos(3,2),'g');
+% 	quiver3(0,0,0,pos(1,3),pos(2,3),pos(3,3),'b');
+% 	% quiver3(0,0,0,post(1,1),post(2,1),post(3,1),'r--');
+% 	% quiver3(0,0,0,post(1,2),post(2,2),post(3,2),'g--');
+% 	% quiver3(0,0,0,post(1,3),post(2,3),post(3,3),'b--');
+% 	% quiver3(0,0,0,v(1),v(2),v(3),'k');
+% 	view(37.5,30);
 
-	d_phi = 0;
-	d_theta = pi/2;
+% 	d_phi = 0;
+% 	d_theta = pi/2;
 
-	k_phi = pi/4;
-	k_theta = pi/6;
+% 	k_phi = pi/4;
+% 	k_theta = pi/6;
 
-	quiver3(0,0,0,cos(d_phi)*sin(d_theta),sin(d_phi)*sin(d_theta),cos(d_theta),'r--');
-	quiver3(0,0,0,-cos(d_phi)*sin(d_theta),-sin(d_phi)*sin(d_theta),-cos(d_theta),'r--');
+% 	quiver3(0,0,0,cos(d_phi)*sin(d_theta),sin(d_phi)*sin(d_theta),cos(d_theta),'r--');
+% 	quiver3(0,0,0,-cos(d_phi)*sin(d_theta),-sin(d_phi)*sin(d_theta),-cos(d_theta),'r--');
 
-	quiver3(0,0,0,cos(k_phi)*sin(k_theta),sin(k_phi)*sin(k_theta),cos(k_theta),0,'k');
-	quiver3(0,0,0,-sin(k_phi),cos(k_phi),0,'k--');
+% 	quiver3(0,0,0,cos(k_phi)*sin(k_theta),sin(k_phi)*sin(k_theta),cos(k_theta),0,'k');
+% 	quiver3(0,0,0,-sin(k_phi),cos(k_phi),0,'k--');
 
-	kt = double(M(-sin(k_phi),cos(k_phi),0,k_theta)*[cos(d_phi)*sin(d_theta);sin(d_phi)*sin(d_theta);cos(d_theta)]);
+% 	kt = double(M(-sin(k_phi),cos(k_phi),0,k_theta)*[cos(d_phi)*sin(d_theta);sin(d_phi)*sin(d_theta);cos(d_theta)]);
  	
-	quiver3(0,0,0,kt(1),kt(2),kt(3),'b--');
+% 	quiver3(0,0,0,kt(1),kt(2),kt(3),'b--');
 
 % figure(2);
 % subplot(2,2,1);

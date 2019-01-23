@@ -6,18 +6,22 @@ function I = PolarizationMicroscopy(v,phiv,a,Excitation)
 	end
 	theta_a = 59.6/180*pi;
 	% theta_a = 0.001;
-	% Excitation = 1/sqrt(2)*[1,1*exp(i*pi/2)];
-	a1 = WavefunctionEnd(v,phiv,[1;0;0]);
-	a2 = WavefunctionEnd(v,phiv,[0;1;0]);
-	a3 = WavefunctionEnd(v,phiv,[0;0;1]);
+	dipole = zeros(3);
+	dipole(:,1) = WavefunctionEnd(v,phiv,[1;0;0]);
+	dipole(:,2) = WavefunctionEnd(v,phiv,[0;1;0]);
+	dipole(:,3) = WavefunctionEnd(v,phiv,[0;0;1]);
 	% p = ExcitationIntensity(a1,a2,a3,Excitation);
 	p = 1/3*[1,1,1];
-	% I_x = a1(1).^2.*a(1)*p(1)+a2(1).^2.*a(2)*p(2)+a3(1).^2.*a(3)*p(3);
-	% I_y = a1(2).^2.*a(1)*p(1)+a2(2).^2.*a(2)*p(2)+a3(2).^2.*a(3)*p(3);
-	% I = [I_x,I_y];
 
-	I = PolarizationProjector(a1,theta_a)*a(1)*p(1)+PolarizationProjector(a2,theta_a)*a(2)*p(2)+PolarizationProjector(a3,theta_a)*a(3)*p(3);
-	% result = (I(1)-I(2))/(I(1)+I(2));
+	I = [0,0];
+	for i = 1:3
+		if a(i)
+			I(1) = I(1)+PolarizationMeasurement(dipole(:,i),[1;0;0])*a(i)*p(i);
+			I(2) = I(2)+PolarizationMeasurement(dipole(:,i),[0;1;0])*a(i)*p(i);
+		end
+	end
+
+	% I = PolarizationProjector(a1,theta_a)*a(1)*p(1)+PolarizationProjector(a2,theta_a)*a(2)*p(2)+PolarizationProjector(a3,theta_a)*a(3)*p(3);
 end
 
 function I = PolarizationProjector(a,u)
@@ -38,7 +42,6 @@ function p = ExcitationIntensity(a1,a2,a3,Excitation)
 	dp_x = [1;0;0];
 	dp_y = [0;1;0];
 
-	% Excitation = [1,0];
 	p(1) = abs(sum(a1.*dp_x)*Excitation(1)+sum(a1.*dp_y)*Excitation(2))^2;
 	p(2) = abs(sum(a2.*dp_x)*Excitation(1)+sum(a2.*dp_y)*Excitation(2))^2;
 	p(3) = abs(sum(a3.*dp_x)*Excitation(1)+sum(a3.*dp_y)*Excitation(2))^2;
