@@ -142,14 +142,16 @@ function [I,centers,varargout] = ExtractIntensity(Dir,ROI_size,varargin)
 	SNR = 1.4;
 	load(Dir);
 
+	sumFrame = squeeze(sum(data));
+
 	if nargin == 3
 		centers1 = varargin{1};
-		centers2 = FindPoints(data,SNR);
+		centers2 = FindPoints(sumFrame,SNR);
 		deviation = PointTrace(centers1,centers2,5);
 		centers = centers1 + repmat(deviation,size(centers1,1),1);
-		centers = FindPeak2D(squeeze(sum(data)),centers,ROI_size,ROI_size/2);
+		centers = FindPeak2D(sumFrame),centers,ROI_size,ROI_size/2);
 	else
-		centers = FindPoints(data,SNR);
+		centers = FindPoints(sumFrame,SNR);
 	end
 
 	ROI = QDPLTraceExtraction(data,centers);
@@ -170,7 +172,6 @@ function [I,centers,varargout] = ExtractIntensity(Dir,ROI_size,varargin)
 
 	if DEBUG
 		FrameShow(data,0,[],figure(6));
-		arrayfun(@(x,y) PlotROI(gcf,gca,[x,y],10,2),centers(:,1),centers(:,2));
 		keyboard;
 	end
 

@@ -18,7 +18,16 @@ function [deviation,varargout] = PointTrace(centers1,centers2,offset)
 
 	C = xcorr2(PointMatrix1,PointMatrix2);
 
-	[Row,Col] = find(C == max(max(C)),1);
+	FirstPeak = max(max(C));
+	[Row,Col] = find(C == FirstPeak,1);
+
+	C(Row-offset:Row+offset,Col-offset:Col+offset) = 0;
+	SecondPeak = max(C(1:end));
+
+	if FirstPeak - SecondPeak < 10
+		ME = MException('PointTrace:PatternNotFound','There are none identical points pattern or more than one patterns!');
+		throw(ME);
+	end
 
 	deviation = -([Row,Col] - [size(PointMatrix1,1),size(PointMatrix1,2)]);
 
@@ -32,4 +41,5 @@ function [deviation,varargout] = PointTrace(centers1,centers2,offset)
 			end
 		end
 	end
+
 end

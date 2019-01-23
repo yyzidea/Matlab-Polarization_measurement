@@ -8,10 +8,14 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 	DEBUG_OPTION = struct('standard',0,'logging',0);
 	ROI_size = 10;
 
-	DataLen = length(regexp(ls(sprintf('%s_*.mat',Dir)),'\w+.mat','match'))/2;
+	DataLen = length(regexp(ls(sprintf('%s_*.mat',Dir)),'[0-9]+.mat','match'));
 
 	result_figure_handle = 1;
 	debug_figure_handle = 5;
+
+	DEBUG = 0;
+	SNR = 20;
+	MaxOverlap = 54;
 
 	for i = 1:nargin
 		switch i
@@ -47,13 +51,13 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 	I_1 = [];
 	I_2 = [];
 
-	DEBUG = 0;
-	SNR = 10;
-	MaxOverlap = 54;
-
 	if DEBUG_OPTION.logging
 		variance_1 = [];
 		variance_2 = [];
+	end
+
+	if ~exist(sprintf('%s_sumFrames.mat',Dir),'file') && length(DataIndexSeries) == DataLen
+		frames = [];
 	end
 
 	if DEBUG_OPTION.standard
@@ -79,18 +83,49 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 	end
 
 	for i = 1:length(DataIndexSeries)
-		load(sprintf('%s_%d.mat',Dir,DataIndexSeries(i)));
+		DataFilePath = sprintf('%s_%d.mat',Dir,DataIndexSeries(i));
+		fprintf('Processing %s.\n',DataFilePath);
+		load(DataFilePath);
 
-		centers = FindPoints(data,SNR,10);
+		sumFrame = squeeze(sum(data));
 
-		arrayfun(@(x,y) PlotROI(gcf,gca,[x,y],10,2),centers(:,1),centers(:,2));
+		if exist('frames','var')
+			if isempty(frames)
+				frames = zeros(size(sumFrame,1),size(sumFrame,2),DataLen);
+			end
+			frames(:,:,i) = sumFrame;
+		end
 
-		centers_LH = centers(centers(:,1)<=256,:);
-		centers_RH = centers(centers(:,1)>256,:);
-		deviation = PointTrace(centers_LH,centers_RH,8);
-		centers_LH = vertcat(centers_LH,centers_RH(centers_RH(:,1)>512-MaxOverlap,:));
-		centers_RH = FindPeak2D(squeeze(sum(data)),centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2);
+		centers = FindPoints(sumFrame,SNR);
 
+		% FrameShow(data,0,centers,figure(2));
+
+		centers_LH = centers(centers(:,1)<=256-MaxOverlap,:);
+		centers_RH = centers(centers(:,1)>256+MaxOverlap,:);
+		try
+			[deviation,map] = PointTrace(centers_LH,centers_RH,8);
+		catch ex
+			switch ex.identifier
+			case 'PointTrace:PatternNotFound'
+				warning(['This data file has been skipped, since there are too less points for point tracing.']);
+				continue;
+			otherwise
+				rethrow(ex);
+			end
+		end
+
+		for j = 1:size(centers_RH,1)
+			if ~sum(map(:,2)==j) && centers_RH(j,1)<=512-MaxOverlap
+				centers_LH = vertcat(centers_LH,FindPeak2D(sumFrame,centers_RH(j,:)-deviation,ROI_size,ROI_size/2));
+				% keyboard;
+			end
+		end
+
+		centers_RHO = centers_RH(centers_RH(:,1)>512-MaxOverlap,:);
+		centers_LH = vertcat(centers_LH,FindPeak2D(sumFrame,centers_RHO-repmat(deviation,size(centers_RHO,1),1),ROI_size,ROI_size/2));
+		centers_RH = FindPeak2D(sumFrame,centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2);
+
+		% keyboard;
 		ROI1 = QDPLTraceExtraction(data,centers_LH);
 		ROI2 = QDPLTraceExtraction(data,centers_RH);
 
@@ -129,9 +164,13 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 			pause(0.1);
 		end
 
-		figure(result_figure_handle);
-		histogram((I_1-I_2)./(I_1+I_2),linspace(-1,1,20));
+		Plot_AnisoAnalysis(I_1,I_2,result_figure_handle);
+
 		drawnow;
+	end
+
+	if exist('frames','var')
+		save(sprintf('%s_sumFrames.mat',Dir),'frames');
 	end
 
 	if DEBUG_OPTION.logging
@@ -141,19 +180,10 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 		varargout{2} = variance_2;
 	end
 
-end
 
-function m = ThresholdMean(ROI)
-	m = zeros(1,size(ROI,1));
-	for i = 1:size(ROI,1)
-		temp = ROI(i,:);
-		[N,edges] = histcounts(temp,10);
-		[~,I] = max(N);
-		if I == 1 || I == 10
-			m(i) = mean(temp(temp>=edges(I)&temp<=edges(I+1)));
-			warning(sprintf('Some unexpected data distribution detected: i = %d,m = %f',i,m(i)));
-		else
-			m(i) = mean(temp(temp>=edges(I-1)&temp<=edges(I+2)));
-		end
+	if DEBUG
+		FrameShow(data,0,[],figure(6));
+		keyboard;
 	end
+
 end
