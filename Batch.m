@@ -3,7 +3,6 @@
 Plot_AnisoAnalysis(Ia_1,Ia_2,2);
 Plot_AnisoAnalysis(Ib_1,Ib_2,3);
 
-
 aniso = sort((I_1-I_2)./(I_1+I_2));
 a1 = aniso(floor(length(aniso)*0.95));
 a2 = aniso(floor(length(aniso)*0.05));
