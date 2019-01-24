@@ -26,9 +26,9 @@
 % A = (1-tan(phi).^2)/(1+tan(phi).^2+2*tan(phi));
 
 %%%%%% Block1 %%%%%%
-	figure(3);
-	clf(3);
-	% SampleNumber = floor(100/pi*6);
+	figure(7);
+	clf(7);
+	% SampleNumber = floor(1000/pi*6);
 	% x0 = rand(1,SampleNumber)*2-1;
 	% % x0(end) = [];
 	% y0 = rand(1,SampleNumber)*2-1;
@@ -40,32 +40,42 @@
 	% x0 = x0(index);
 	% y0 = y0(index);
 	% z0 = z0(index);
+
+	% phi1 = rand(1,1000)*2*pi;
+	% theta1 = rand(1,1000)*pi;
+	% x1 = cos(phi1).*sin(theta1);
+	% y1 = sin(phi1).*sin(theta1);
+	% z1 = cos(theta1);
+	% phiv1 = rand(1,length(x1))*2*pi;
+
+
 	% phiv = rand(1,length(x0))*2*pi;
 	% Excitation = 1/sqrt(2)*[1,1*exp(1i*pi/2)];
 
+
 	% SampleNumber = length(x0);
 
-	% aniso = zeros(1,SampleNumber);
+	aniso_1D_3 = zeros(1,1000);
 	tic;
 	t0 = toc;
 	for i = 1:SampleNumber
-		aniso(i) = Anisotropy([x0(i);y0(i);z0(i)],phiv(i),[0.5;0.5;0],Excitation);
+		% aniso_1D_1(i) = Anisotropy([x0(i);y0(i);z0(i)],phiv(i),[0;0;1],Excitation);
+		aniso_1D_3(i) = Anisotropy([x1(i);y1(i);z1(i)],phiv(i),[0;0;1],Excitation);
+		
 		if mod(i,10) == 0
 			fprintf('Completed: %d/%d Elapse Time:%.2f/%.2f\n',i,SampleNumber,toc-t0,(toc-t0)/i*(SampleNumber-i));
 		end
 	end
 
-	% aniso = arrayfun(@(x0,y0,z0,theta0) Anisotropy(x0,y0,z0,theta0,0.5,0.5,0),x0,y0,z0,theta);
-
-
-	% N = histcounts(aniso,10);
-	histogram(aniso,linspace(-1,1,40));
+	% subplot(1,2,1);
+	histogram(aniso_1D_3*ScaleRatio,linspace(-1,1,10));
 	xlim([-1,1]);
 
-	% at = cell2mat(arrayfun(@(x0,y0,z0,theta0) WavefunctionEnd([x0;y0;z0],theta0,[0;0;1]),x0,y0,z0,phiv,'UniformOutput',false));
+	% % at = cell2mat(arrayfun(@(x0,y0,z0,theta0) WavefunctionEnd([x0;y0;z0],theta0,[0;0;1]),x0,y0,z0,phiv,'UniformOutput',false));
+	% at = cell2mat(arrayfun(@(x0,y0,z0,theta0) WavefunctionEnd([x0;y0;z0],theta0,[0;0;1]),x1,y1,z1,phiv1,'UniformOutput',false));
 
-	% subplot(2,2,4);
-	% plot3(at(1,:),at(2,:),at(3,:),'o');
+	% subplot(1,2,2);
+	% plot3(at(1,:).*aniso_2D_2*ScaleRatio,at(2,:).*aniso_2D_2*ScaleRatio,at(3,:).*aniso_2D_2*ScaleRatio,'o');
 	% axis equal;
 
 % %%%%%% Block2 %%%%%%

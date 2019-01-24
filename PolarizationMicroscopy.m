@@ -4,8 +4,8 @@ function I = PolarizationMicroscopy(v,phiv,a,Excitation)
 	elseif sum(a) ~= 1
 		warning('The total emission probability is not equal to one!');
 	end
-	theta_a = 59.6/180*pi;
-	% theta_a = 0.001;
+	% theta_a = asin(1.4/1.5);
+	theta_a = 0.001;
 	dipole = zeros(3);
 	dipole(:,1) = WavefunctionEnd(v,phiv,[1;0;0]);
 	dipole(:,2) = WavefunctionEnd(v,phiv,[0;1;0]);
@@ -13,15 +13,15 @@ function I = PolarizationMicroscopy(v,phiv,a,Excitation)
 	% p = ExcitationIntensity(a1,a2,a3,Excitation);
 	p = 1/3*[1,1,1];
 
-	I = [0,0];
-	for i = 1:3
-		if a(i)
-			I(1) = I(1)+PolarizationMeasurement(dipole(:,i),[1;0;0])*a(i)*p(i);
-			I(2) = I(2)+PolarizationMeasurement(dipole(:,i),[0;1;0])*a(i)*p(i);
-		end
-	end
+	% I = [0,0];
+	% for i = 1:3
+	% 	if a(i)
+	% 		I(1) = I(1)+PolarizationMeasurement(dipole(:,i),[1;0;0])*a(i)*p(i);
+	% 		I(2) = I(2)+PolarizationMeasurement(dipole(:,i),[0;1;0])*a(i)*p(i);
+	% 	end
+	% end
 
-	% I = PolarizationProjector(a1,theta_a)*a(1)*p(1)+PolarizationProjector(a2,theta_a)*a(2)*p(2)+PolarizationProjector(a3,theta_a)*a(3)*p(3);
+	I = PolarizationProjector(dipole(:,1),theta_a)*a(1)*p(1)+PolarizationProjector(dipole(:,2),theta_a)*a(2)*p(2)+PolarizationProjector(dipole(:,3),theta_a)*a(3)*p(3);
 end
 
 function I = PolarizationProjector(a,u)
