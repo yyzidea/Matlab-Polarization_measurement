@@ -1,4 +1,4 @@
-function output = ErrorAnalysis(DebugLog,figure_handle)
+function output = ErrorAnalysis(DebugLog,varargin)
 	output = zeros(1,length(DebugLog));
 
 	for i = 1:length(DebugLog)
@@ -9,11 +9,24 @@ function output = ErrorAnalysis(DebugLog,figure_handle)
 
 		result(:,result(2,:)<max(result(2,:)/2)) = [];
 
-		output(i) = mean(std(result(1,:)));
+		m = mean(result(1,:));
+		s = std(result(1,:));
+		n = size(result,2);
+
+		z = abs(icdf('T',0.025,n));
+		output(i) = 2*s/sqrt(n)*z;
+
 	end
 
-	figure(figure_handle);
-	clf(figure_handle);
+	if nargin == 2
+		figure(varargin{1});
+		clf(varargin{1});
+		plot(output);
+	elseif nargin > 3
+		error('Too many input arguments!');
+	end
 
-	plot(output);
+	% m = mean(output);
+	% range = max(output)-min(output);
+	% output(abs(output-m))
 end

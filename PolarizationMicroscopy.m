@@ -2,7 +2,7 @@ function I = PolarizationMicroscopy(v,phiv,a,Excitation)
 	if ~sum(a)
 		error('The probability array ''a'' is zero!');
 	elseif sum(a) ~= 1
-		warning('The total emission probability is not equal to one!');
+		warning('The total emission probability is not equal to one: [%f,%f,%f]!',a(1),a(2),a(3));
 	end
 	theta_a = asin(1.4/1.5);
 	% theta_a = 0.001;
