@@ -7,10 +7,15 @@ function Plot_AnisoAnalysis(I_1,I_2,figure_handle,varargin)
 	figure(figure_handle);
 	clf(figure_handle);
 
-	[aniso,~] = AnisoCalc(I_1,I_2,varargin{1});
+	if nargin == 4
+		[aniso,~] = AnisoCalc(I_1,I_2,varargin{1});
+	else 
+		[aniso,~] = AnisoCalc(I_1,I_2);
+	end
+		
 	r = DipoleGeometryRatio(std(aniso)*2);
 
-	subplot(2,1,1);
+	subplot(2,1,1);	
 	histogram(aniso,linspace(-1,1,20));
 	set(gca,'FontSize',14);
 	title(sprintf('Anisotropy distribution with a std width: %.4f\n Estimate ratio: %.2f and %.2f',std(aniso)*2,r(1),r(2)));

@@ -13,7 +13,8 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 
 	CurrentDataIndex = 0;
 	ImageShowFlag = 1;
-	
+	SpecialCenterDetection = 0;
+
 	indexs = 1:length(DebugLog);
 
 	if ImageShowFlag
@@ -33,7 +34,9 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 				case 'Indexs'
 					indexs = varargin{i*2};
 				case 'ImageShowFlag'
-					ImageShowFlag =  varargin{i*2};
+					ImageShowFlag =  varargin{i*2};					
+				case 'SpecialCenterDetection'
+					SpecialCenterDetection =  varargin{i*2};
 				otherwise
 					ME = MException('DebugLogAnalysis:IllegalArgumentsPairs','Illegal input arguments pairs:%s',varargin{i*2-1});
 					throw(ME);
@@ -50,8 +53,18 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 		I_1 = ThresholdMean(DebugLog(index).ROI1);
 		I_2 = ThresholdMean(DebugLog(index).ROI2);
 
-		if (I_1-I_2)/(I_1+I_2) > -0.2 && (I_1-I_2)/(I_1+I_2) < 0.1
-			continue;
+		if SpecialCenterDetection 
+
+			% temp = (DebugLog(index).ROI1-DebugLog(index).ROI2)./(DebugLog(index).ROI1+DebugLog(index).ROI2);
+			% if std(temp)>0.1
+
+			temp = std(DebugLog(index).ROI1+DebugLog(index).ROI2)/mean(DebugLog(index).ROI1+DebugLog(index).ROI2);
+			if temp > 0.2
+
+			% if (I_1-I_2)/(I_1+I_2) > -0.2 && (I_1-I_2)/(I_1+I_2) < 0.1	
+				continue;
+			end
+			fprintf('Intensity fluctuation: %.4f\n',temp);
 		end
 
 		fprintf('CurrentLog: index:%d, DataIndex:%d, SpecialCenters1:(%d,%d), SpecialCenters2:(%d,%d)\n',index,DebugLog(index).DataIndex,...

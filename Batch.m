@@ -6,6 +6,9 @@
 figure(6);
 clf(6);
 
+load('/Users/mac/Documents/MATLAB/Polarization measurement/Result/results_181220.mat');
+load('/Users/mac/Documents/MATLAB/Polarization measurement/Result/results_181221.mat');
+
 aniso = AnisoCalc(Ia_1,Ia_2,true);
 ErrorBar = mean(ErrorAnalysis(DebugLog_a));
 StdWidth = (std(aniso)-ErrorBar)*2;
@@ -17,7 +20,7 @@ r = DipoleGeometryRatio(StdWidth);
 subplot(1,3,1);
 histogram(aniso,linspace(-1,1,20));
 set(gca,'FontSize',14);
-title(sprintf('Width: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
+title(sprintf('QD#1 (3 min) Data#1\nWidth: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
 
 aniso = AnisoCalc(Ib_1,Ib_2,true);
 ErrorBar = mean(ErrorAnalysis(DebugLog_b));
@@ -30,7 +33,7 @@ r = DipoleGeometryRatio(StdWidth);
 subplot(1,3,2);
 histogram(aniso,linspace(-1,1,20));
 set(gca,'FontSize',14);
-title(sprintf('Width: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
+title(sprintf('QD#1 (3 min) Data#2\nWidth: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
 
 aniso = AnisoCalc(I_1,I_2,true);
 ErrorBar = mean(ErrorAnalysis(DebugLog));
@@ -43,7 +46,7 @@ r = DipoleGeometryRatio(StdWidth);
 subplot(1,3,3);
 histogram(aniso,linspace(-1,1,20));
 set(gca,'FontSize',14);
-title(sprintf('Width: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
+title(sprintf('QD#2 (20 min)\nWidth: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
 
 % aniso = sort((I_1-I_2)./(I_1+I_2));
 % a1 = aniso(floor(length(aniso)*0.95));
