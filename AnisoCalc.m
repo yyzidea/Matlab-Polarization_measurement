@@ -15,4 +15,6 @@ function [aniso,varargout] = AnisoCalc(I_1,I_2,varargin)
 	end
 
 	aniso = (r*R-1)./(r*R+1);
+
+	aniso(isnan(aniso)) = 1;
 end

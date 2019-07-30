@@ -23,3 +23,10 @@ subplot(2,1,2);
 title('PL fluctuation');
 set(gca,'FontSize',14);
 
+I_1 = zeros(size(DebugLog));
+I_2 = zeros(size(DebugLog));
+
+for i = 1:length(I_1)
+	I_1(i) = ThresholdMean(DebugLog(i).ROI1);
+	I_2(i) = ThresholdMean(DebugLog(i).ROI2);
+end

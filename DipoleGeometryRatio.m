@@ -4,6 +4,7 @@ function r = DipoleGeometryRatio(StdWidth)
 	else
 		error('AnisoStdFit.mat doesn''t exist!');
 	end
+	keyboard;
 
 	if StdWidth == 0
 		r = [1,1];
