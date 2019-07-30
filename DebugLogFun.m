@@ -1,4 +1,4 @@
-function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,figure_handle)
+function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,FluctuationType,figure_handle)
 	% This function analysis the log structure 'DebugLog' outputed by function 'AnisoAnalysis'.
 	% Here, the position and PL trace of centers logged in 'DebugLog' will be shown in 'figure_handle'. 
 
@@ -41,7 +41,19 @@ function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,figure_handle)
 		ROI2 = DebugLog(indexs(i)).ROI2;
 
 		% if std((ROI1-ROI2)./(ROI1+ROI2))<=Threshold
-		fluctuation(i) = std(ROI1+ROI2)/mean(ROI1+ROI2);
+		switch FluctuationType
+			case 'fluctuation'
+				fluctuation(i) = (max(ROI1+ROI2)-min(ROI1+ROI2))/mean(ROI1+ROI2);
+			case 'blinking'
+				fluctuation(i) = std(ROI1+ROI2)/mean(ROI1+ROI2);
+			otherwise
+				error('Illegal ''FluctuationType''!');
+		end
+		% if fluctuation(i) >= 1
+		% 	figure(2);subplot(2,1,1);plot(ROI1);subplot(2,1,2);plot(ROI2);
+		% 	fprintf('%.4f\n',fluctuation(i));
+		% 	pause;
+		% end
 		if fluctuation(i) <= Threshold
 			I_1(end+1) = ThresholdMean(ROI1);
 			I_2(end+1) = ThresholdMean(ROI2);
@@ -54,7 +66,15 @@ function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,figure_handle)
 	subplot(2,1,1);
 	histogram(aniso,linspace(-1,1,20));
 	subplot(2,1,2);
-	histogram(fluctuation,15);
+
+	switch FluctuationType
+		case 'fluctuation'
+			histogram(fluctuation,15);
+		case 'blinking'
+			histogram(fluctuation,linspace(0,2,16));
+		otherwise
+			error('Illegal ''FluctuationType''!');
+	end
 
 	fprintf('Centers number: %d; Pass ratio: %.1f \n',length(aniso),length(aniso)/length(DebugLog)*100);
 

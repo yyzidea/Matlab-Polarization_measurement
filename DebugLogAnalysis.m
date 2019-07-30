@@ -15,7 +15,7 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 	ImageShowFlag = 1;
 	SpecialCenterDetection = 0;
 
-	indexs = 1:length(DebugLog);
+	indices = 1:length(DebugLog);
 
 	if ImageShowFlag
 		if exist(sprintf('%s_sumFrames.mat',DebugLog(1).DataDir),'file')
@@ -31,8 +31,8 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 
 		for i = 1:(nargin-3)/2
 			switch varargin{i*2-1}
-				case 'Indexs'
-					indexs = varargin{i*2};
+				case 'Indices'
+					indices = varargin{i*2};
 				case 'ImageShowFlag'
 					ImageShowFlag =  varargin{i*2};					
 				case 'SpecialCenterDetection'
@@ -47,8 +47,8 @@ function DebugLogAnalysis(DebugLog,LogType,figure_handle,varargin)
 		throw(ME);
 	end
 
-	for i = 1:length(indexs)
-		index = indexs(i);
+	for i = 1:length(indices)
+		index = indices(i);
 
 		I_1 = ThresholdMean(DebugLog(index).ROI1);
 		I_2 = ThresholdMean(DebugLog(index).ROI2);

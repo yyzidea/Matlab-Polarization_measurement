@@ -8,19 +8,20 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 	DEBUG_OPTION = struct('standard',0,'logging',0);
 	ROI_size = 10;
 
-	DataLen = length(regexp(ls(sprintf('%s_*.mat',Dir)),'[0-9]+.mat','match'));
+	DataIndexSeries = sort(cellfun(@(c) str2num(c{1}),regexp(ls(sprintf('%s_*.mat',Dir)),'([0-9]+).mat','tokens')));
+	DataLen = DataIndexSeries(end);
 
-	result_figure_handle = 1;
+	result_figure_handle = 3;
 	debug_figure_handle = 5;
 
 	DEBUG = 0;
-	SNR = 20;
+	SNR = 30;
 	MaxOverlap = 54;
 
 	for i = 1:nargin
 		switch i
 			case 1
-				DataIndexSeries = 1:DataLen;
+
 			case 2
 				if ~ischar(varargin{1})
 					DataIndexSeries = varargin{1};
@@ -56,8 +57,10 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 		variance_2 = [];
 	end
 
-	if ~exist(sprintf('%s_sumFrames.mat',Dir),'file') && length(DataIndexSeries) == DataLen
+	if ~exist(sprintf('%s_sumFrames.mat',Dir),'file')
 		frames = [];
+	else
+		load(sprintf('%s_sumFrames.mat',Dir));
 	end
 
 	if DEBUG_OPTION.standard
@@ -84,21 +87,32 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 
 	for i = 1:length(DataIndexSeries)
 		DataFilePath = sprintf('%s_%d.mat',Dir,DataIndexSeries(i));
+		try
+			load(DataFilePath);
+		catch ex
+			switch ex.identifier
+				case 'MATLAB:load:couldNotReadFile'
+					fprintf('The data of index %d is missing. So skip to the next data file.\n',DataIndexSeries(i));
+					continue;
+				otherwise
+					rethrow(ex);
+			end
+		end
+
 		fprintf('Processing %s.\n',DataFilePath);
-		load(DataFilePath);
 
 		sumFrame = squeeze(sum(data));
 
-		if exist('frames','var')
-			if isempty(frames)
-				frames = zeros(size(sumFrame,1),size(sumFrame,2),DataLen);
-			end
-			frames(:,:,i) = sumFrame;
+		if isempty(frames)
+			frames = zeros(size(sumFrame,1),size(sumFrame,2),DataLen);
 		end
+		frames(:,:,i) = sumFrame;
 
 		centers = FindPoints(sumFrame,SNR);
-
-		% FrameShow(data,0,centers,figure(2));
+		
+		if DEBUG
+			FrameShow(data,0,centers,figure(3));
+		end
 
 		centers_LH = centers(centers(:,1)<=256-MaxOverlap,:);
 		centers_RH = centers(centers(:,1)>256+MaxOverlap,:);
@@ -106,11 +120,11 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 			[deviation,map] = PointTrace(centers_LH,centers_RH,8);
 		catch ex
 			switch ex.identifier
-			case 'PointTrace:PatternNotFound'
-				warning(['This data file has been skipped, since there are too less points for point tracing.']);
-				continue;
-			otherwise
-				rethrow(ex);
+				case 'PointTrace:PatternNotFound'
+					warning(['This data file has been skipped, since there are too less points for point tracing.']);
+					continue;
+				otherwise
+					rethrow(ex);
 			end
 		end
 
@@ -120,14 +134,19 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 				% keyboard;
 			end
 		end
-
+		keyboard;
 		centers_RHO = centers_RH(centers_RH(:,1)>512-MaxOverlap,:);
 		centers_LH = vertcat(centers_LH,FindPeak2D(sumFrame,centers_RHO-repmat(deviation,size(centers_RHO,1),1),ROI_size,ROI_size/2));
-		centers_RH = FindPeak2D(sumFrame,centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2);
+		centers_RH = FindPeak2D(sumFrame,centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2));
 
 		% keyboard;
 		ROI1 = QDPLTraceExtraction(data,centers_LH);
 		ROI2 = QDPLTraceExtraction(data,centers_RH);
+
+		if DEBUG
+			FrameShow(data,0,centers_LH,figure(4));
+			FrameShow(data,0,centers_RH,figure(5));
+		end
 
 		I_1 = horzcat(I_1,ThresholdMean(ROI1));
 		I_2 = horzcat(I_2,ThresholdMean(ROI2));
@@ -169,9 +188,7 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 		drawnow;
 	end
 
-	if exist('frames','var')
-		save(sprintf('%s_sumFrames.mat',Dir),'frames');
-	end
+	save(sprintf('%s_sumFrames.mat',Dir),'frames');
 
 	if DEBUG_OPTION.logging
 		varargout{1} = DebugLog;
@@ -182,7 +199,6 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 
 
 	if DEBUG
-		FrameShow(data,0,[],figure(6));
 		keyboard;
 	end
 
