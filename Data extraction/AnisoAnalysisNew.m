@@ -134,10 +134,10 @@ function [I_1,I_2,varargout] = AnisoAnalysisNew(Dir,varargin)
 				% keyboard;
 			end
 		end
-		keyboard;
+
 		centers_RHO = centers_RH(centers_RH(:,1)>512-MaxOverlap,:);
 		centers_LH = vertcat(centers_LH,FindPeak2D(sumFrame,centers_RHO-repmat(deviation,size(centers_RHO,1),1),ROI_size,ROI_size/2));
-		centers_RH = FindPeak2D(sumFrame,centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2));
+		centers_RH = FindPeak2D(sumFrame,centers_LH+repmat(deviation,size(centers_LH,1),1),ROI_size,ROI_size/2);
 
 		% keyboard;
 		ROI1 = QDPLTraceExtraction(data,centers_LH);
