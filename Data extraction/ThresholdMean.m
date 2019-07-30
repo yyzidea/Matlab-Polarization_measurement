@@ -15,4 +15,5 @@ function m = ThresholdMean(ROI)
 			m(i) = mean(temp(temp>=edges(I-1)&temp<=edges(I+2)));
 		end
 	end
+	m(isnan(m)) = 0;
 end

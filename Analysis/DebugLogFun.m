@@ -3,35 +3,13 @@ function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,FluctuationType,figure_handl
 	% Here, the position and PL trace of centers logged in 'DebugLog' will be shown in 'figure_handle'. 
 
 	indexs = 1:length(DebugLog);
-	
-	% if nargin >=4
-	% 	if ~mod(nargin,2)
-	% 		ME = MException('DebugLogAnalysis:IllegalArgumentsPairs','Illegal input arguments pairs.');
-	% 		throw(ME);
-	% 	end
 
-	% 	for i = 1:(nargin-3)/2
-	% 		switch varargin{i*2-1}
-	% 			case 'Indexs'
-	% 				indexs = varargin{i*2};
-	% 			case 'ImageShowFlag'
-	% 				ImageShowFlag =  varargin{i*2};					
-	% 			case 'SpecialCenterDetection'
-	% 				SpecialCenterDetection =  varargin{i*2};
-	% 			otherwise
-	% 				ME = MException('DebugLogAnalysis:IllegalArgumentsPairs','Illegal input arguments pairs:%s',varargin{i*2-1});
-	% 				throw(ME);
-	% 		end
-	% 	end
-	% elseif nargin<=2
-	% 	ME = MException('DebugLogAnalysis:NotEnoughArguments','Not enough input arguments!');
-	% 	throw(ME);
-	% end
-
-	aniso = [];
 	I_1 = [];
 	I_2 = [];
-	fluctuation = zeros(1,length(indexs));
+	FluctuationRange = zeros(1,length(indexs));
+	FluctuationStd = zeros(1,length(indexs));
+
+	warning off;
 	for i = 1:length(indexs)
 		DataDir = DebugLog(indexs(i)).DataDir;
 		DataIndex = DebugLog(indexs(i)).DataIndex;
@@ -39,42 +17,58 @@ function [I_1,I_2] = DebugLogFun(DebugLog,Threshold,FluctuationType,figure_handl
 		SpecialCenters2 = DebugLog(indexs(i)).SpecialCenters2;
 		ROI1 = DebugLog(indexs(i)).ROI1;
 		ROI2 = DebugLog(indexs(i)).ROI2;
+		FluctuationRange(i) = (max(ROI1+ROI2)-min(ROI1+ROI2))/mean(ROI1+ROI2);
+		FluctuationStd(i) = std(ROI1+ROI2)/mean(ROI1+ROI2);
 
 		% if std((ROI1-ROI2)./(ROI1+ROI2))<=Threshold
 		switch FluctuationType
-			case 'fluctuation'
-				fluctuation(i) = (max(ROI1+ROI2)-min(ROI1+ROI2))/mean(ROI1+ROI2);
-			case 'blinking'
-				fluctuation(i) = std(ROI1+ROI2)/mean(ROI1+ROI2);
+			case 'range'
+				fluctuation = FluctuationRange(i);
+			case 'std'
+				fluctuation = FluctuationStd(i);
 			otherwise
 				error('Illegal ''FluctuationType''!');
 		end
-		% if fluctuation(i) >= 1
-		% 	figure(2);subplot(2,1,1);plot(ROI1);subplot(2,1,2);plot(ROI2);
-		% 	fprintf('%.4f\n',fluctuation(i));
-		% 	pause;
-		% end
-		if fluctuation(i) <= Threshold
+
+		if 1
+		% if fluctuation <= Threshold
 			I_1(end+1) = ThresholdMean(ROI1);
 			I_2(end+1) = ThresholdMean(ROI2);
-			aniso(end+1) = (I_1(end)-I_2(end))./(I_1(end)+I_2(end));
+		
+		% else
+		% 	DebugLogAnalysis(DebugLog,'new',2,'Indices',i);
+		% 	ResizeFigure(2,1);
+		% 	% keyboard;
 		end
 	end
+	warning on;
 
 	figure(figure_handle);
 	clf(figure_handle);
-	subplot(2,1,1);
-	histogram(aniso,linspace(-1,1,20));
-	subplot(2,1,2);
+	
+	subplot(3,1,1);
 
-	switch FluctuationType
-		case 'fluctuation'
-			histogram(fluctuation,15);
-		case 'blinking'
-			histogram(fluctuation,linspace(0,2,16));
-		otherwise
-			error('Illegal ''FluctuationType''!');
+	aniso = AnisoCalc(I_1,I_2,true);
+	ErrorBar = mean(ErrorAnalysis(DebugLog));
+	StdWidth = (std(aniso)-ErrorBar)*2;
+	if StdWidth<0
+		StdWidth = 0;
 	end
+	r = DipoleGeometryRatio(StdWidth);
+
+	histogram(aniso,linspace(-1,1,20));
+	title(sprintf('Width: %.3f, error: %.3f, Ratio: %.2f or %.2f\n Centers number: %d, Pass ratio: %.1f',StdWidth,ErrorBar*2,r(1),r(2),length(aniso),length(aniso)/length(DebugLog)*100));
+	set(gca,'FontSize',14);
+
+	subplot(3,1,2);
+	histogram(FluctuationRange,linspace(0,2,16));
+	title('The histogram of fluctuation range');
+	set(gca,'FontSize',14);
+
+	subplot(3,1,3);
+	histogram(FluctuationStd,linspace(0,1,16));
+	title('The histogram of fluctuation std');
+	set(gca,'FontSize',14);
 
 	fprintf('Centers number: %d; Pass ratio: %.1f \n',length(aniso),length(aniso)/length(DebugLog)*100);
 

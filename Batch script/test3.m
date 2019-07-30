@@ -1,32 +1,5 @@
-figure(1);
-ErrorBar = mean(ErrorAnalysis(DebugLog));
-aniso = AnisoCalc(I_1,I_2,true);
-
-StdWidth = (std(aniso)-ErrorBar)*2;
-if StdWidth<0
-	StdWidth = 0;
-end
-r = DipoleGeometryRatio(StdWidth);
-
-Plot_AnisoAnalysis(I_1,I_2,1,true)
-
-subplot(2,1,1);
-set(gca,'FontSize',14);
-title(sprintf('3 min QD Data\nWidth: %.3f and error bar: %.3f\n Estimate ratio: %.2f or %.2f',StdWidth,ErrorBar*2,r(1),r(2)));
-
-
-subplot(2,1,1);
-title(sprintf('The anisotropy distribution\nfor QDs of a fluctuation less than 20%%'));
-set(gca,'FontSize',14);
-
-subplot(2,1,2);
-title('PL fluctuation');
-set(gca,'FontSize',14);
-
-I_1 = zeros(size(DebugLog));
-I_2 = zeros(size(DebugLog));
-
-for i = 1:length(I_1)
-	I_1(i) = ThresholdMean(DebugLog(i).ROI1);
-	I_2(i) = ThresholdMean(DebugLog(i).ROI2);
-end
+DebugLogFun(DebugLog_1,0.2,'std',21);
+DebugLogFun(DebugLog_2,0.2,'std',22);
+DebugLogFun(DebugLog_3,0.2,'std',23);
+DebugLogFun(DebugLog_4,0.2,'std',24);
+DebugLogFun(DebugLog_5,0.2,'std',25);
